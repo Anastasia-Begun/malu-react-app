@@ -34,5 +34,4 @@ jobs:
           channelId: live
           projectId: malu-af0b0
         env:
-         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MALU_AF0B0 }}
-    
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MALU_AF0B0 }}
