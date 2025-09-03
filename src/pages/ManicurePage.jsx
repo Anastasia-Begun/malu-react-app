@@ -1,6 +1,6 @@
 import React from "react";
 import SpecialOffersManicure from "../components/SpecialOffersManicure";
-import Footer from "../components/footer";
+import Footer from "../components/Footer.jsx";
 
 const ManicurePage = ({ onSelectOffer }) => {
   return (

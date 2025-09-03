@@ -1,6 +1,6 @@
 import React from "react";
 import SpecialOffers from "../components/SpecialOffers"; // твой домашний слайдер
-import Footer from "../components/footer";
+import Footer from "../components/Footer.jsx";
 
 const HomePage = ({ onSelectOffer }) => {
   return (

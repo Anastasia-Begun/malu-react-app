@@ -1,6 +1,6 @@
 import React from "react";
 import SpecialOffersMakeup from "../components/SpecialOffersMakeup";
-import Footer from "../components/footer";
+import Footer from "../components/Footer.jsx";
 
 const MakeupPage = ({ onSelectOffer }) => {
   return (
