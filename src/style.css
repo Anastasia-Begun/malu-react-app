@@ -743,122 +743,75 @@ transition: background-color 0.3s ease;
 background-color: #cc0000;
 }
 
-/* =========================
-   Responsive breakpoints
-   1200 / 960 / 780 / 360
-   ========================= */
 
-/* ≤1200px (large tablets / small desktops) */
-@media (max-width: 1200px) {
-  .hero{
-    display: grid;               /* уже есть, оставляем на всякий */
-    grid-template-columns: 1fr 1fr;
-    min-height: auto;
-  }
-  .hero-left{
-    padding: 56px 36px;
-  }
-  .hero-left h1{
-    font-size: 48px;
-  }
-  .offer-info{
-    gap: 12px;
-  }
-}
 
-/* ≤960px (tablets / landscape phones) */
-@media (max-width: 960px) {
-  .topbar{
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px 16px;
-  }
-  .topbar a{
-    display: inline-flex;
-    align-items: center;
-    margin-right: 8px;
-  }
+@media (max-width: 1024px) {
+  .maxwidth-theme { padding-left: 16px; padding-right: 16px; }
+  .topbar { padding: 10px 16px; }
+  .topbar ul { gap: 12px; }
 
-  .hero{
-    grid-template-columns: 1fr;  /* колонки → одна колонка */
-  }
-  .hero-right{
-    height: 320px;               /* чтобы картинка была видна после стака */
-  }
-  .hero-left{
-    padding: 40px 24px;
-    text-align: center;
-    align-items: center;
-  }
-  .hero-left p{
-    max-width: 100%;
-  }
+  .hero { display: flex; flex-direction: row; gap: 20px; }
+  .hero-left, .hero-right { flex: 1 1 50%; }
+  .hero-left h1 { font-size: clamp(24px, 3vw, 36px); }
+  .hero-left p { font-size: 16px; }
 
-  .offer-info{
-    flex-direction: column;
-    align-items: stretch;
-    text-align: left;
-    gap: 8px;
-  }
-
-  .news-section{
-    flex-direction: column;
-  }
-
-  .footer-section{
-    flex-wrap: wrap;
-    gap: 24px;
-    justify-content: center;
-  }
-}
-
-/* ≤780px (phones – common portrait width) */
-@media (max-width: 780px) {
-  .hero-right{
-    height: 260px;
-  }
-  .hero-left{
-    padding: 28px 16px;
-  }
-  .hero-left h1{
-    font-size: 36px;
-    line-height: 1.15;
-  }
-  .offer-info{
-    padding: 10px 12px;
-  }
-  .booking{
-    width: 100%;
-    max-width: 320px;
-    text-align: center;
-  }
-  .footer-section{
+  .services-grid, .gallery-grid, .price-grid, .booking-list-section, .offers-grid, .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
     gap: 16px;
   }
+
+  .contact-form, .booking-form, form { max-width: 640px; margin: 0 auto; }
 }
 
-/* ≤360px (small phones) */
-@media (max-width: 360px) {
-  .hero-right{
-    height: 220px;
+@media (max-width: 768px) {
+  .topbar { position: sticky; top: 0; z-index: 50; }
+  .topbar ul { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .auth-controls { flex-wrap: wrap; gap: 8px; }
+  #user-email-display { font-size: 12px; }
+
+  .hero { flex-direction: column; align-items: stretch; text-align: left; }
+  .hero-left, .hero-right { width: 100%; }
+  .hero-right img, .hero-right video { width: 100%; height: auto; border-radius: 8px; }
+
+  .card, .service-card, .offer-card, .booking-card { width: 100%; }
+
+  .services-grid, .gallery-grid, .price-grid, .booking-list-section, .offers-grid, .cards-grid {
+    grid-template-columns: 1fr;
   }
-  .hero-left{
-    padding: 20px 12px;
+
+  .table-wrapper, .list-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 640px; }
+
+  .btn, .btn-primary, .btn-secondary, button {
+    padding: 12px 16px;
   }
-  .hero-left h1{
-    font-size: 28px;
-  }
-  .hero-left p{
-    font-size: 14px;
-  }
-  .offer-info{
-    padding: 8px 10px;
-  }
-  .topbar{
-    gap: 8px;
-    padding: 10px 12px;
-  }
-  .footer-section{
-    gap: 12px;
-  }
+  .btn-wide, .contact-form .btn-primary, .booking .btn-primary { width: 100%; }
+
+  .contact-container, .contact-content, .contact-map { width: 100%; }
+  .contact-map iframe { width: 100% !important; height: 320px !important; }
+
+  .modal-content { width: 100% !important; max-width: 480px; margin: 0 12px; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 14px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+  h3 { font-size: 16px; }
+  p, li { line-height: 1.45; }
+
+  .topbar { padding: 8px 12px; }
+  .topbar ul a { padding: 8px 0; }
+
+  .hero-left h1 { font-size: 22px; }
+  .hero-left p { font-size: 14px; }
+
+  .section { padding: 16px 0; }
+  .card, .service-card, .offer-card, .booking-card { padding: 12px; }
+
+  .icon, .nav-icon, .contact-item svg { width: 18px; height: 18px; }
+
+
+  img.responsive, .gallery-grid img, .hero-right img { max-height: 260px; object-fit: cover; }
 }
