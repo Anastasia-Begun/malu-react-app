@@ -801,28 +801,39 @@ background-color: #cc0000;
 
 @media (max-width: 480px) {
 
+  .topbar { width: 100%; }
 
-  body { font-size: 14px; }
-  h1 { font-size: 22px; }
-  h2 { font-size: 18px; }
-  h3 { font-size: 16px; }
-  p, li { line-height: 1.45; }
+  
+  .hero { display: block; min-height: auto; }
+  .hero-left, .hero-right { width: 100%; }
+  .hero-right { overflow: visible; }
+  .hero-right img { width: 100%; height: auto; object-fit: contain; display: block; }
 
-  .topbar { padding: 8px 12px; }
-  .topbar ul a { padding: 8px 0; }
+   оба блока на всю ширину */
+  .innovations { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+  .innovations-left { width: 100%; max-width: none; border-radius: 8px; }
+  .innovations-right { width: 100%; }
+  .innovations-right img { max-width: 100%; height: auto; }
 
-  .hero-left h1 { font-size: 22px; }
-  .hero-left p { font-size: 14px; }
+  /* Новости: колонки → одна колонка, обе части растягиваются */
+  .news-section { display: block; border-radius: 8px; overflow: hidden; }
+  .news-left, .news-right { width: 100%; padding: 20px; box-sizing: border-box; }
+  .news-left h2, .news-right h2 { text-align: left; }
 
+  /* Спецпредложения и карточки — на всю ширину, меньше паддинги контейнера */
+  .offers-container { padding: 16px; gap: 16px; }
+  .offer-card { width: 100%; }
+
+  .contact-details { padding: 24px 16px; gap: 16px; }
+  .contact-item { width: 100%; }
+
+  .contact-form { max-width: 100%; padding: 0 0; }
+  .auth-form-card { width: 100%; }
+  .auth-modal-content { width: 95%; max-width: 95%; margin: 10% auto; }
+
+  .btn, .btn-primary, .btn-secondary, button { width: 100%; }
+  .news-button { width: 100%; }
+
+  .special-offers { padding: 32px 0; margin-top: 32px; }
   .section { padding: 16px 0; }
-  .card, .service-card, .offer-card, .booking-card { padding: 12px; }
-
-  .icon, .nav-icon, .contact-item svg { width: 18px; height: 18px; }
-
-  .innovations, .news-section, .hero {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: left;
-  }
-
 }
