@@ -819,8 +819,10 @@ background-color: #cc0000;
 
   .icon, .nav-icon, .contact-item svg { width: 18px; height: 18px; }
 
-  .innovations, .news-section {
-flex-direction: column;
+  .innovations, .news-section, .hero {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
   }
 
 }
