@@ -813,6 +813,4 @@ background-color: #cc0000;
 
   .icon, .nav-icon, .contact-item svg { width: 18px; height: 18px; }
 
-
-  img.responsive, .gallery-grid img, .hero-right img { max-height: 260px; object-fit: cover; }
 }
