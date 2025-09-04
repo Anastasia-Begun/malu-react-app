@@ -797,6 +797,36 @@ background-color: #cc0000;
   .news-left, .news-right {
     width: 100%;
   }
+
+  .innovations {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .innovations-left {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch;     
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .innovations-right {
+    width: 100%;
+    flex-direction: column;
+  }
+  .innovations-right img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .innovations-left-text-content {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0 0 16px 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -809,18 +839,30 @@ background-color: #cc0000;
   .hero-right { overflow: visible; }
   .hero-right img { width: 100%; height: auto; object-fit: contain; display: block; }
 
-   оба блока на всю ширину */
-  .innovations { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
-  .innovations-left { width: 100%; max-width: none; border-radius: 8px; }
-  .innovations-right { width: 100%; }
-  .innovations-right img { max-width: 100%; height: auto; }
+  .innovations: {flex-direction: column ;}
 
-  /* Новости: колонки → одна колонка, обе части растягиваются */
+  .innovations-left {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .innovations-left img {
+    width: 100%;
+    height: auto;
+    margin-top: 16px; 
+  }
+  .innovations-left-text-content p {
+    font-size: 18px;   
+    line-height: 1.4;
+  }
+
+ 
   .news-section { display: block; border-radius: 8px; overflow: hidden; }
   .news-left, .news-right { width: 100%; padding: 20px; box-sizing: border-box; }
   .news-left h2, .news-right h2 { text-align: left; }
 
-  /* Спецпредложения и карточки — на всю ширину, меньше паддинги контейнера */
+
   .offers-container { padding: 16px; gap: 16px; }
   .offer-card { width: 100%; }
 
