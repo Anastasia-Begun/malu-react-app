@@ -742,4 +742,123 @@ transition: background-color 0.3s ease;
 .cancel-booking-btn:hover {
 background-color: #cc0000;
 }
-/* Cache busting comment: 2023-10-27 */
+
+/* =========================
+   Responsive breakpoints
+   1200 / 960 / 780 / 360
+   ========================= */
+
+/* ≤1200px (large tablets / small desktops) */
+@media (max-width: 1200px) {
+  .hero{
+    display: grid;               /* уже есть, оставляем на всякий */
+    grid-template-columns: 1fr 1fr;
+    min-height: auto;
+  }
+  .hero-left{
+    padding: 56px 36px;
+  }
+  .hero-left h1{
+    font-size: 48px;
+  }
+  .offer-info{
+    gap: 12px;
+  }
+}
+
+/* ≤960px (tablets / landscape phones) */
+@media (max-width: 960px) {
+  .topbar{
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .topbar a{
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+
+  .hero{
+    grid-template-columns: 1fr;  /* колонки → одна колонка */
+  }
+  .hero-right{
+    height: 320px;               /* чтобы картинка была видна после стака */
+  }
+  .hero-left{
+    padding: 40px 24px;
+    text-align: center;
+    align-items: center;
+  }
+  .hero-left p{
+    max-width: 100%;
+  }
+
+  .offer-info{
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    gap: 8px;
+  }
+
+  .news-section{
+    flex-direction: column;
+  }
+
+  .footer-section{
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+  }
+}
+
+/* ≤780px (phones – common portrait width) */
+@media (max-width: 780px) {
+  .hero-right{
+    height: 260px;
+  }
+  .hero-left{
+    padding: 28px 16px;
+  }
+  .hero-left h1{
+    font-size: 36px;
+    line-height: 1.15;
+  }
+  .offer-info{
+    padding: 10px 12px;
+  }
+  .booking{
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+  .footer-section{
+    gap: 16px;
+  }
+}
+
+/* ≤360px (small phones) */
+@media (max-width: 360px) {
+  .hero-right{
+    height: 220px;
+  }
+  .hero-left{
+    padding: 20px 12px;
+  }
+  .hero-left h1{
+    font-size: 28px;
+  }
+  .hero-left p{
+    font-size: 14px;
+  }
+  .offer-info{
+    padding: 8px 10px;
+  }
+  .topbar{
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .footer-section{
+    gap: 12px;
+  }
+}
