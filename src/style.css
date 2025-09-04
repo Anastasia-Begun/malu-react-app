@@ -792,6 +792,11 @@ background-color: #cc0000;
   .contact-map iframe { width: 100% !important; height: 320px !important; }
 
   .modal-content { width: 100% !important; max-width: 480px; margin: 0 12px; }
+
+  
+  .news-left, .news-right {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
