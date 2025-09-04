@@ -839,7 +839,7 @@ background-color: #cc0000;
   .hero-right { overflow: visible; }
   .hero-right img { width: 100%; height: auto; object-fit: contain; display: block; }
 
-  .innovations: {flex-direction: column ;}
+  .innovations {flex-direction: column ;}
 
   .innovations-left {
     width: 100% !important;
