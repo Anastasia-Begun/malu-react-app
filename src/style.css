@@ -4,7 +4,6 @@
   --muted: rgba(255,255,255,0.85);
 }
 
-/* html, body{height:100%} */
 body{
   margin:0;
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
@@ -18,7 +17,7 @@ a {
 }
 
 .maxwidth-theme{
-    width: 1500px;
+    max-width: 1500px;
     padding: 0px 24px 0px 24px;
     margin: 0 auto;
 }
@@ -748,7 +747,6 @@ background-color: #cc0000;
 
 
 @media (max-width: 1024px) {
-  .maxwidth-theme { padding-left: 16px; padding-right: 16px; width: 1024px; }
   .topbar { padding: 10px 16px; }
   .topbar ul { gap: 12px; }
 
@@ -798,9 +796,6 @@ background-color: #cc0000;
 
 @media (max-width: 480px) {
 
-  .maxwidth-theme {
-    width: 480px;
-  }
 
   body { font-size: 14px; }
   h1 { font-size: 22px; }
