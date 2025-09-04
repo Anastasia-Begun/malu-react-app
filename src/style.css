@@ -652,7 +652,6 @@ align-items: flex-end;
   margin-top: 20px;
 }
 
-/* Secondary Button Styles (for Google Sign-in/Register) */
 .btn-secondary {
   background-color: rgb(220, 113, 122); /* A slightly lighter shade of your primary color */
   color: white;
@@ -668,18 +667,21 @@ align-items: flex-end;
   gap: 10px;
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin-top: 10px; /* Applied universally to secondary buttons */
+  margin-top: 10px;
   width: 100%;
   box-sizing: border-box;
   text-align: center;
 }
 
 .btn-secondary:hover {
-  background-color: rgb(202, 93, 102); /* Your primary color on hover */
-}
+  background-color: rgb(202, 93, 102); }
 
-/* Media Queries for Responsiveness (Optional but recommended) */
 @media (max-width: 768px) {
+
+  .maxwidth-theme {
+      width: 768px;
+  }
+
   .auth-modal-content {
     width: 90%;
     margin: 10% auto;
@@ -746,7 +748,7 @@ background-color: #cc0000;
 
 
 @media (max-width: 1024px) {
-  .maxwidth-theme { padding-left: 16px; padding-right: 16px; }
+  .maxwidth-theme { padding-left: 16px; padding-right: 16px; width: 1024px; }
   .topbar { padding: 10px 16px; }
   .topbar ul { gap: 12px; }
 
@@ -771,7 +773,6 @@ background-color: #cc0000;
   #user-email-display { font-size: 12px; }
 
   .hero { flex-direction: column; align-items: stretch; text-align: left; }
-  .hero-left, .hero-right { width: 100%; }
   .hero-right img, .hero-right video { width: 100%; height: 50%; object-fit: contain; margin: 0 auto;
     display: block; }
 
@@ -796,6 +797,11 @@ background-color: #cc0000;
 }
 
 @media (max-width: 480px) {
+
+  .maxwidth-theme {
+    width: 480px;
+  }
+
   body { font-size: 14px; }
   h1 { font-size: 22px; }
   h2 { font-size: 18px; }
