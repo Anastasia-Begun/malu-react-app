@@ -795,7 +795,7 @@ background-color: #cc0000;
 
   
   .news-left, .news-right {
-    max-width: 100%;
+    width: 100%;
   }
 }
 
