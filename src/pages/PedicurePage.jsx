@@ -93,7 +93,6 @@ const PedicurePage = ({ onSelectOffer }) => {
         </div>
       </section>
 
-      {/* Слайдер спецпредложений по педикюру */}
       <SpecialOffersPedicure onSelectOffer={onSelectOffer} />
 
       <section className="footer-section">

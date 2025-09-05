@@ -45,27 +45,43 @@ const ContactsPage = () => {
       </section>
 
       <section className="contact-form-section">
-        <h2>Отправьте нам сообщение</h2>
-        <form action="#" method="post" className="contact-form">
-          <div className="form-group">
-            <label htmlFor="name">Ваше имя:</label>
-            <input type="text" id="name" name="name" required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Ваш Email:</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="subject">Тема:</label>
-            <input type="text" id="subject" name="subject" />
-          </div>
-          <div className="form-group">
-            <label htmlFor="message">Сообщение:</label>
-            <textarea id="message" name="message" rows="6" required></textarea>
-          </div>
-          <button type="submit" className="btn-primary">ОТПРАВИТЬ</button>
-        </form>
-      </section>
+  <h2>Отправьте нам сообщение</h2>
+  <form
+    action="https://formsubmit.co/begun0anastasia1@gmail.com"
+    method="POST"
+    className="contact-form"
+  >
+    <input type="hidden" name="_subject" value="Новое сообщение с формы" />
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_next" value="https://malu-af0b0.web.app/contacts" />
+    
+    <input type="text" name="_honey" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
+
+    <div className="form-group">
+      <label htmlFor="name">Ваше имя:</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="email">Ваш Email:</label>
+      <input type="email" id="email" name="_replyto" required />
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="subject">Тема:</label>
+      <input type="text" id="subject" name="subject" />
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="message">Сообщение:</label>
+      <textarea id="message" name="message" rows="6" required />
+    </div>
+
+    <button type="submit" className="btn-primary">ОТПРАВИТЬ</button>
+  </form>
+</section>
+
 
       <Footer />
     </div>
