@@ -16,11 +16,11 @@ import {
   runTransaction,
 } from "firebase/firestore";
 
-const ServicesModal = ({ isOpen, onClose }) => {
+const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) => {
   const { db, user } = useFirebase();
 
-  const [service, setService] = useState("makeup");
-  const [subService, setSubService] = useState("day");
+  const [service, setService] = useState(initialService || "makeup");
+  const [subService, setSubService] = useState(initialSubService || "day");
   const [date, setDate] = useState("");    
   const [slotId, setSlotId] = useState("");  
   const [freeSlots, setFreeSlots] = useState([]);
@@ -39,6 +39,12 @@ const ServicesModal = ({ isOpen, onClose }) => {
   ), [service, subService]);
 
   const minDate = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  // Обновляем состояние при изменении пропсов
+  useEffect(() => {
+    if (initialService) setService(initialService);
+    if (initialSubService) setSubService(initialSubService);
+  }, [initialService, initialSubService]);
 
   useEffect(() => {
     if (!db || !isOpen) return;
@@ -142,15 +148,35 @@ const ServicesModal = ({ isOpen, onClose }) => {
   };
 
   const onBackdropClick = (e) => {
+    console.log('ServicesModal backdrop clicked', e.target, e.currentTarget);
     if (e.target === e.currentTarget) {
+      console.log('Closing ServicesModal');
       onClose?.();
     }
   };
 
+  // Обработчик клика на document для закрытия модалки
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && e.target.classList.contains('auth-modal')) {
+        console.log('Document click - closing ServicesModal');
+        onClose?.();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="auth-modal" onClick={onBackdropClick} role="dialog" aria-label="Запись на прием" style={{ display: isOpen ? "block" : "none" }}>
+    <div className="auth-modal" onClick={onBackdropClick} role="dialog" aria-label="Запись на прием">
       <div className="auth-modal-content" onClick={(ev) => ev.stopPropagation()}>
         <span className="close-button" onClick={onClose} aria-label="Закрыть">×</span>
 

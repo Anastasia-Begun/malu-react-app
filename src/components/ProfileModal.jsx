@@ -45,10 +45,30 @@ export default function ProfileModal({ isOpen, onClose }) {
   };
 
   const onBackdropClick = (e) => {
+    console.log('ProfileModal backdrop clicked', e.target, e.currentTarget);
     if (e.target === e.currentTarget) {
+      console.log('Closing ProfileModal');
       onClose();
     }
   };
+
+  // Обработчик клика на document для закрытия модалки
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && e.target.classList.contains('modal-backdrop')) {
+        console.log('Document click - closing ProfileModal');
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFirebase } from '../firebase/FirebaseContext';
 
 const AuthModal = ({ isOpen, onClose }) => {
@@ -47,13 +47,33 @@ const AuthModal = ({ isOpen, onClose }) => {
   };
 
   const onBackdropClick = (e) => {
+    console.log('AuthModal backdrop clicked', e.target, e.currentTarget);
     if (e.target === e.currentTarget) {
+      console.log('Closing AuthModal');
       onClose();
     }
   };
 
+  // Обработчик клика на document для закрытия модалки
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && e.target.classList.contains('auth-modal')) {
+        console.log('Document click - closing AuthModal');
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   return (
-    <div className="auth-modal" onClick={onBackdropClick} style={{ display: isOpen ? 'block' : 'none' }}>
+    <div className="auth-modal" onClick={onBackdropClick}>
       <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
         <span className="close-button" onClick={onClose}>&times;</span>
         <section className="auth-section">
