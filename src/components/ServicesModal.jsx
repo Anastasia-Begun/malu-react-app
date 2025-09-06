@@ -142,7 +142,7 @@ const ServicesModal = ({ isOpen, onClose }) => {
   };
 
   const onBackdropClick = (e) => {
-    if (e.target.classList && e.target.classList.contains("auth-modal")) {
+    if (e.target === e.currentTarget) {
       onClose?.();
     }
   };
@@ -289,7 +289,7 @@ const ServicesModal = ({ isOpen, onClose }) => {
               <div>
                 <strong>Стоимость:&nbsp;</strong>
                 <span style={{ fontWeight: 700 }}>
-                  {Number.isFinite(selectedPrice) ? selectedPrice.toLocaleString("ru-RU") : "—"} ₽
+                  {Number.isFinite(selectedPrice) ? selectedPrice : "—"} ₽
                 </span>
               </div>
             </div>

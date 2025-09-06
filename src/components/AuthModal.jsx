@@ -46,9 +46,15 @@ const AuthModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const onBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="auth-modal" style={{ display: isOpen ? 'block' : 'none' }}>
-      <div className="auth-modal-content">
+    <div className="auth-modal" onClick={onBackdropClick} style={{ display: isOpen ? 'block' : 'none' }}>
+      <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
         <span className="close-button" onClick={onClose}>&times;</span>
         <section className="auth-section">
           <h1>Авторизация</h1>
