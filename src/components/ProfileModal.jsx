@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import { db } from "../lib/firebase";
+import { useFirebase } from "../firebase/FirebaseContext";
 import {
   collection, query, where, onSnapshot,
   doc, updateDoc, deleteField
 } from "firebase/firestore";
 
 export default function ProfileModal({ isOpen, onClose }) {
-  const [user, setUser] = useState(null);
+  const { db, user } = useFirebase();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
-
-  
-  // Подписка на изменения авторизации (получаем текущего пользователя)
-  useEffect(() => onAuth(setUser), []);
 
   useEffect(() => {
     if (!isOpen || !user) return;
@@ -20,7 +16,7 @@ export default function ProfileModal({ isOpen, onClose }) {
     const q = query(
       collection(db, "slots"),
       where("status", "==", "booked"),
-      where("user.uid", "==", user.uid)
+      where("userUid", "==", user.uid)
     );
 
     const off = onSnapshot(

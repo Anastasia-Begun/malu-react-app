@@ -523,7 +523,8 @@ align-items: flex-end;
   height: 100%; 
   overflow: auto;
   background-color: rgba(0,0,0,0.6);
-  padding-top: 60px; 
+  padding-top: 60px;
+  cursor: pointer; 
 }
 
 .auth-modal-content {
@@ -535,6 +536,7 @@ align-items: flex-end;
   max-width: 900px;
   border-radius: 10px;
   position: relative;
+  cursor: default;
 }
 
 .close-button {
@@ -878,4 +880,78 @@ background-color: #cc0000;
 
   .special-offers { padding: 32px 0; margin-top: 32px; }
   .section { padding: 16px 0; }
+}
+
+.modal-backdrop {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.modal {
+  background-color: #323534;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  cursor: default;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #fff;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+}
+
+.modal-header button:hover {
+  color: #ccc;
+}
+
+.slot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+  color: #fff;
+}
+
+.slot-row button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  width: auto;
+}
+
+.slot-row button:hover {
+  background: #0056b3;
 }
