@@ -1,137 +1,158 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useFirebase } from "../firebase/FirebaseContext";
+import {
+  useFirebase,
+  serverTimestamp,
+  Timestamp,
+  anonSignIn,
+  auth,
+} from "../firebase/FirebaseContext";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  doc,
+  runTransaction,
+} from "firebase/firestore";
 
-/**
- * Использование:
- * <ServicesModal
- *   isOpen={showServicesModal}
- *   onClose={() => setShowServicesModal(false)}
- *   initialService="manicure"              // например, из клика по карточке
- *   initialSubService="gel"                // "day" | "evening" | "bridal" | "women" | "men" | "kids" | ...
- * />
- */
-const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) => {
+const ServicesModal = ({ isOpen, onClose }) => {
   const { db, user } = useFirebase();
 
   const [service, setService] = useState("makeup");
-  const [subService, setSubService] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [bookingConfirmationMessage, setBookingConfirmationMessage] = useState("");
+  const [subService, setSubService] = useState("day");
+  const [date, setDate] = useState("");    
+  const [slotId, setSlotId] = useState("");  
+  const [freeSlots, setFreeSlots] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState("");
 
-  // Прайс-лист и подпункты
-  const SERVICES = {
-    makeup: {
-      label: "Макияж",
-      options: {
-        day: { label: "Дневной", price: 1800 },
-        evening: { label: "Вечерний", price: 3900 },
-        bridal: { label: "Свадебный", price: 6800 },
-      },
-    },
-    haircut: {
-      label: "Стрижка волос",
-      options: {
-        women: { label: "Женская", price: 3500 },
-        men: { label: "Мужская", price: 2000 },
-        kids: { label: "Детская", price: 1800 },
-      },
-    },
-    manicure: {
-      label: "Маникюр",
-      options: {
-        classic: { label: "Классический", price: 1900 },
-        gel: { label: "Гель-лак", price: 2400 },
-        extension: { label: "Наращивание", price: 3300 },
-        design: { label: "Дизайн ногтей", price: 2700 },
-      },
-    },
-    pedicure: {
-      label: "Педикюр",
-      options: {
-        classic: { label: "Классический", price: 1600 },
-        hardware: { label: "Аппаратный", price: 2400 },
-        spa: { label: "SPA", price: 3600 },
-        medical: { label: "Лечебный", price: 3800 },
-      },
-    },
+  const PRICES = {
+    makeup: { day: 1500, evening: 2900, bridal: 4800 },
+    haircut: 3500,
+    manicure: 1900,
+    pedicure: 3200,
   };
 
-  // Минимально возможная дата — сегодня
+  const selectedPrice = useMemo(() => (
+    service === "makeup" ? PRICES.makeup[subService] : (PRICES[service] ?? 0)
+  ), [service, subService]);
+
   const minDate = useMemo(() => new Date().toISOString().split("T")[0], []);
 
-  // Цена выбранного подпункта
-  const selectedPrice = useMemo(() => {
-    if (!service || !subService) return 0;
-    return SERVICES[service].options[subService]?.price ?? 0;
-  }, [service, subService]);
-
-  // Применяем пресет при ОТКРЫТИИ модалки (или при изменении initial*)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!db || !isOpen) return;
+    const now = Timestamp.fromDate(new Date());
+    const qFree = query(
+      collection(db, "slots"),
+      where("status", "==", "free"),
+      where("start", ">=", now),
+      orderBy("start", "asc")
+    );
+    setLoading(true);
+    const unsub = onSnapshot(
+      qFree,
+      (snap) => {
+        setFreeSlots(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setLoading(false);
+      },
+      (err) => {
+        console.error(err);
+        setLoading(false);
+        setMsg(
+          err.code === "failed-precondition"
+            ? "Нужен индекс (status asc, start asc)."
+            : "Ошибка загрузки слотов: " + err.message
+        );
+      }
+    );
+    return () => unsub();
+  }, [db, isOpen]);
 
-    // если пришли валидные initialService/initialSubService — ставим их
-    if (initialService && SERVICES[initialService]) {
-      setService(initialService);
-      const hasSub =
-        initialSubService && SERVICES[initialService].options[initialSubService];
-      const firstSubKey = Object.keys(SERVICES[initialService].options)[0];
-      setSubService(hasSub ? initialSubService : firstSubKey);
-    } else {
-      // без пресета — используем текущую услугу и её первый подпункт
-      const firstSubKey = Object.keys(SERVICES[service].options)[0];
-      setSubService(firstSubKey);
-    }
+  const fmt = (t) =>
+    t?.toDate?.()?.toLocaleString?.("ru-RU", { dateStyle: "short", timeStyle: "short" });
 
-    // сбрасываем поля даты/времени/сообщения при каждом открытии
-    setDate("");
-    setTime("");
-    setBookingConfirmationMessage("");
-  }, [isOpen, initialService, initialSubService]); // намеренно НЕ включаем service, чтобы не сбивать выбранное вручную
+  const daySlots = useMemo(() => {
+    if (!date) return [];
+    const s = new Date(date + "T00:00:00");
+    const e = new Date(date + "T23:59:59.999");
+    return freeSlots.filter((x) => {
+      const d = x.start?.toDate?.();
+      return d && d >= s && d <= e;
+    });
+  }, [date, freeSlots]);
+
+  const ensureSignedIn = async () => {
+    if (auth.currentUser) return auth.currentUser;
+    await anonSignIn();
+    return auth.currentUser;
+  };
 
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
+    setMsg("");
 
-    if (!service || !subService || !date || !time) {
-      setBookingConfirmationMessage("Ошибка: выберите услугу, подпункт, дату и время.");
-      return;
-    }
-
-    if (!user) {
-      alert("Пожалуйста, войдите, чтобы записаться.");
-      onClose();
-      return;
-    }
+    if (!date) return setMsg("Укажите дату.");
+    if (!slotId) return setMsg("Выберите время.");
 
     try {
-      await db.collection("bookings").add({
-        userId: user.uid,
-        userEmail: user.email,
-        service,              // "makeup" | "haircut" | "manicure" | "pedicure"
-        subService,           // ключ подпункта (например, "gel", "women", "day", ...)
-        price: selectedPrice,
-        date,                 // YYYY-MM-DD
-        time,                 // HH:mm
-        timestamp: new Date()
+      await ensureSignedIn();
+      const uid = auth.currentUser?.uid;
+      if (!uid) return setMsg("Не удалось получить UID. Повторите.");
+
+      const chosen = daySlots.find((s) => s.id === slotId);
+      if (!chosen) return setMsg("Выбранный слот уже недоступен.");
+
+      const slotRef = doc(db, "slots", slotId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(slotRef);
+        if (!snap.exists()) throw new Error("Слот не найден.");
+        const data = snap.data();
+        const now = Timestamp.fromDate(new Date());
+
+        if (data.status !== "free") throw new Error("Слот уже занят.");
+        if (data.start.toMillis() < now.toMillis()) throw new Error("Слот в прошлом.");
+
+        tx.update(slotRef, {
+          status: "booked",
+          userUid: uid,
+          user: { name: user?.displayName || user?.email || "Клиент" },
+          service,
+          subService: service === "makeup" ? subService : null,
+          price: selectedPrice,
+          bookedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
       });
 
-      setBookingConfirmationMessage("Запись успешно создана!");
+      setMsg("Запись успешно создана!");
       setTimeout(() => {
-        setBookingConfirmationMessage("");
-        onClose();
-      }, 2000);
-    } catch (error) {
-      console.error("Ошибка при создании записи:", error);
-      setBookingConfirmationMessage("Ошибка при создании записи: " + error.message);
+        setMsg("");
+        setSlotId("");
+        onClose?.();
+      }, 1200);
+    } catch (err) {
+      console.error(err);
+      setMsg(
+        err.code === "permission-denied"
+          ? "Недостаточно прав (проверь правила Firestore / App Check)."
+          : "Ошибка: " + err.message
+      );
+    }
+  };
+
+  const onBackdropClick = (e) => {
+    if (e.target.classList && e.target.classList.contains("auth-modal")) {
+      onClose?.();
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="auth-modal" style={{ display: "block" }}>
-      <div className="auth-modal-content">
-        <span className="close-button" onClick={onClose}>&times;</span>
+    <div className="auth-modal" onClick={onBackdropClick} role="dialog" aria-label="Запись на прием" style={{ display: isOpen ? "block" : "none" }}>
+      <div className="auth-modal-content" onClick={(ev) => ev.stopPropagation()}>
+        <span className="close-button" onClick={onClose} aria-label="Закрыть">×</span>
 
         <section className="auth-section">
           <h1>Запись на прием и услуги</h1>
@@ -144,57 +165,56 @@ const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) =
               color: "white",
             }}
           >
-            <form
-              onSubmit={handleBookingSubmit}
-              style={{ marginTop: 20, textAlign: "left", display: "grid", gap: 16 }}
-            >
-              {/* Услуга */}
+            <form onSubmit={handleBookingSubmit} style={{ marginTop: 20, textAlign: "left", display: "grid", gap: 16 }}>
               <div className="form-group">
                 <label htmlFor="service-select">Выберите услугу:</label>
                 <select
                   id="service-select"
                   value={service}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    setService(val);
-                    // ставим первый подпункт выбранной услуги
-                    const firstSubKey = Object.keys(SERVICES[val].options)[0];
-                    setSubService(firstSubKey);
+                    const v = e.target.value;
+                    setService(v);
+                    if (v !== "makeup") setSubService("day");
                   }}
                   style={{
-                    width: "100%", padding: 10, borderRadius: 5,
+                    width: "100%",
+                    padding: 10,
+                    borderRadius: 5,
                     border: "1px solid rgba(255,255,255,0.3)",
-                    backgroundColor: "rgba(255,255,255,0.1)", color: "#111",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "#111",
                   }}
                 >
-                  {Object.entries(SERVICES).map(([key, val]) => (
-                    <option key={key} value={key}>{val.label}</option>
-                  ))}
+                  <option value="makeup">Макияж</option>
+                  <option value="haircut">Стрижка волос</option>
+                  <option value="manicure">Маникюр</option>
+                  <option value="pedicure">Педикюр</option>
                 </select>
               </div>
 
-              {/* Подпункт */}
-              <div className="form-group">
-                <label htmlFor="subservice-select">Выберите тип:</label>
-                <select
-                  id="subservice-select"
-                  value={subService}
-                  onChange={(e) => setSubService(e.target.value)}
-                  style={{
-                    width: "100%", padding: 10, borderRadius: 5,
-                    border: "1px solid rgba(255,255,255,0.3)",
-                    backgroundColor: "rgba(255,255,255,0.1)", color: "#111",
-                  }}
-                >
-                  {Object.entries(SERVICES[service].options).map(([key, val]) => (
-                    <option key={key} value={key}>
-                      {val.label} — {val.price} ₽
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {service === "makeup" && (
+                <div className="form-group">
+                  <label htmlFor="makeup-sub">Вид макияжа:</label>
+                  <select
+                    id="makeup-sub"
+                    value={subService}
+                    onChange={(e) => setSubService(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: 10,
+                      borderRadius: 5,
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      color: "#111",
+                    }}
+                  >
+                    <option value="day">Дневной — 1 500 ₽</option>
+                    <option value="evening">Вечерний — 2 900 ₽</option>
+                    <option value="bridal">Свадебный — 4 800 ₽</option>
+                  </select>
+                </div>
+              )}
 
-              {/* Дата */}
               <div className="form-group">
                 <label htmlFor="date-select">Выберите дату:</label>
                 <input
@@ -202,68 +222,77 @@ const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) =
                   id="date-select"
                   value={date}
                   min={minDate}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={(e) => { setDate(e.target.value); setSlotId(""); }}
                   style={{
-                    width: "100%", padding: 10, borderRadius: 5,
+                    width: "100%",
+                    padding: 10,
+                    borderRadius: 5,
                     border: "1px solid rgba(255,255,255,0.3)",
-                    backgroundColor: "rgba(255,255,255,0.1)", color: "#111",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "#111",
                   }}
                 />
               </div>
 
-              {/* Время */}
               <div className="form-group">
-                <label htmlFor="time-select">Выберите время:</label>
-                <input
-                  type="time"
+                <label htmlFor="time-select">Время:</label>
+                <select
                   id="time-select"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  step="1800" // шаг 30 минут
+                  value={slotId}
+                  disabled={loading || !date}
+                  onChange={(e) => setSlotId(e.target.value)}
                   style={{
-                    width: "100%", padding: 10, borderRadius: 5,
+                    width: "100%",
+                    padding: 10,
+                    borderRadius: 5,
                     border: "1px solid rgba(255,255,255,0.3)",
-                    backgroundColor: "rgba(255,255,255,0.1)", color: "#111",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "#111",
                   }}
-                />
+                >
+                  <option value="">{loading ? "Загрузка…" : "Выберите время…"}</option>
+                  {daySlots.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {fmt(s.start)}
+                    </option>
+                  ))}
+                  {!loading && date && daySlots.length === 0 && (
+                    <option disabled>Свободных слотов на этот день нет</option>
+                  )}
+                </select>
               </div>
 
-              <button type="submit" className="btn-primary" style={{ alignSelf: "center" }}>
+              <button type="submit" className="btn-primary" style={{ marginTop: 8, width: "auto", alignSelf: "center" }}>
                 Записаться
               </button>
             </form>
 
-            {/* Сообщение об ошибке/успехе */}
-            {bookingConfirmationMessage && (
-              <p
-                style={{
-                  marginTop: 15,
-                  color: bookingConfirmationMessage.startsWith("Ошибка") ? "red" : "lightgreen",
-                }}
-              >
-                {bookingConfirmationMessage}
+            {msg && (
+              <p style={{ marginTop: 15, color: msg.includes("Ошибка") || msg.includes("прав") ? "red" : "lightgreen" }}>
+                {msg}
               </p>
             )}
 
-            {/* Блок итоговой цены */}
-            {subService && SERVICES[service].options[subService] && (
-              <div
-                aria-live="polite"
-                style={{
-                  marginTop: 16, padding: "12px 14px",
-                  background: "rgba(255,255,255,0.15)", borderRadius: 8,
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                }}
-              >
-                <div>
-                  <strong>Стоимость:</strong>{" "}
-                  {SERVICES[service].options[subService].label} —{" "}
-                  <span style={{ fontWeight: 700 }}>
-                    {selectedPrice.toLocaleString("ru-RU")} ₽
-                  </span>
-                </div>
+            <div
+              aria-live="polite"
+              style={{
+                marginTop: 16,
+                padding: "12px 14px",
+                background: "rgba(255,255,255,0.15)",
+                borderRadius: 8,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <div>
+                <strong>Стоимость:&nbsp;</strong>
+                <span style={{ fontWeight: 700 }}>
+                  {Number.isFinite(selectedPrice) ? selectedPrice.toLocaleString("ru-RU") : "—"} ₽
+                </span>
               </div>
-            )}
+            </div>
           </div>
         </section>
       </div>
