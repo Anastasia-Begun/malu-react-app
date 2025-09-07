@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFirebase } from '../firebase/FirebaseContext';
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const { auth } = useFirebase();
