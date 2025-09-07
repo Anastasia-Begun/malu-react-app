@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFirebase } from '../firebase/FirebaseContext';
+import firebase from 'firebase/compat/app';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const { auth } = useFirebase();
@@ -37,7 +38,7 @@ const AuthModal = ({ isOpen, onClose }) => {
   };
 
   const handleGoogle = async (setError) => {
-    const googleProvider = new auth.GoogleAuthProvider();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
     try {
       await auth.signInWithPopup(googleProvider);
       onClose();
