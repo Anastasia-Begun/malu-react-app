@@ -386,6 +386,7 @@ background-color:  rgb(202, 50, 102);
 display: flex;
 justify-content: space-between;
 align-items: flex-end;
+text-align: left;
 }
 
 .contact-hero {
