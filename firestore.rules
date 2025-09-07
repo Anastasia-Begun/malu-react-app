@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Разрешаем читать свободные слоты всем
+    match /slots/{slotId} {
+      allow read: if true;
+      // Запись — только для авторизованных (включая анонимных)
+      allow write: if request.auth != null;
+    }
+
+    // Профили пользователей: каждый читает/пишет только свой документ (по email)
+    match /users/{email} {
+      allow read, write: if request.auth != null && request.auth.token.email == email;
+    }
+
+    // По умолчанию запрещаем всё остальное
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

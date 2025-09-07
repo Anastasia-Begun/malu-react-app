@@ -3,12 +3,22 @@ import { useFirebase } from '../firebase/FirebaseContext';
 import { NavLink } from 'react-router-dom';
 
 const Navbar = ({ onOpenAuthModal, onOpenServicesModal, onOpenProfileModal }) => {
-  const { user } = useFirebase();
+  const { user, auth } = useFirebase();
   const [userEmail, setUserEmail] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
 
   useEffect(() => {
-    setUserEmail(user ? user.email : '');
+    setUserEmail(user ? (user.email || user.displayName || '') : '');
+    setPhotoUrl(user?.photoURL || '');
   }, [user]);
+
+  const logout = async () => {
+    try {
+      await auth.signOut();
+    } catch (e) {
+      console.error('Sign out error', e);
+    }
+  };
 
   const handleOpenBooking = (e) => {
     e.preventDefault();
@@ -32,15 +42,30 @@ const Navbar = ({ onOpenAuthModal, onOpenServicesModal, onOpenProfileModal }) =>
       </ul>
 
       <div className="auth-controls" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        {userEmail && (
-          <span
-            id="user-email-display"
+        {user ? (
+          <div
+            role="button"
             title="Открыть профиль"
-            style={{ display: 'inline', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
             onClick={() => onOpenProfileModal && onOpenProfileModal()}
           >
-            {userEmail}
-          </span>
+            {photoUrl && (
+              <img
+                src={photoUrl}
+                alt="Профиль"
+                width={28}
+                height={28}
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+              />
+            )}
+            <span id="user-email-display" style={{ textDecoration: 'underline' }}>
+              {userEmail}
+            </span>
+          </div>
+        ) : (
+          <a className="booking" href="#" onClick={onOpenAuthModal}>
+            Войти
+          </a>
         )}
 
         <a className="booking" href="#" onClick={handleOpenBooking}>

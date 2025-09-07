@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useFirebase } from "../firebase/FirebaseContext";
 import {
   collection, query, where, onSnapshot,
-  doc, updateDoc, deleteField
+  doc, getDoc, setDoc, updateDoc, deleteField
 } from "firebase/firestore";
 
 export default function ProfileModal({ isOpen, onClose }) {
-  const { db, user } = useFirebase();
+  const { db, user, auth } = useFirebase();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [savingPhoto, setSavingPhoto] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !user) return;
@@ -31,6 +33,44 @@ export default function ProfileModal({ isOpen, onClose }) {
     );
     return () => off();
   }, [isOpen, user]);
+
+  // Загрузка фото профиля из users/{email}
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!isOpen || !user?.email) return;
+      try {
+        const ref = doc(db, "users", user.email);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          setProfilePicture(snap.data()?.profilePicture || "");
+        }
+      } catch (e) {
+        // не блокируем UI
+        console.warn("load profile error", e);
+      }
+    };
+    loadProfile();
+  }, [isOpen, user, db]);
+
+  const onPhotoChange = async (ev) => {
+    const file = ev.target.files?.[0];
+    if (!file || !user?.email) return;
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result;
+      try {
+        setSavingPhoto(true);
+        setProfilePicture(String(base64));
+        const ref = doc(db, "users", user.email);
+        await setDoc(ref, { profilePicture: String(base64) }, { merge: true });
+      } catch (e) {
+        setErr("Ошибка сохранения фото профиля: " + (e?.message || e));
+      } finally {
+        setSavingPhoto(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const cancel = async (id) => {
     try {
@@ -75,9 +115,37 @@ export default function ProfileModal({ isOpen, onClose }) {
   return (
     <div className="modal-backdrop" onClick={onBackdropClick}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>Мои записи</h3>
-          <button onClick={onClose}>×</button>
+        <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {(profilePicture || user?.photoURL) && (
+              <img src={profilePicture || user.photoURL} alt="Профиль" width={56} height={56} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <strong>{user?.displayName || user?.email || 'Профиль'}</strong>
+              {user?.email && <span style={{ opacity: 0.75 }}>{user.email}</span>}
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={async () => {
+                try { await auth.signOut(); } catch(e) {}
+                onClose();
+              }}
+              className="booking"
+              style={{ background: 'transparent', border: '1px solid #888', color: '#fff', padding: '6px 10px' }}
+            >
+              Выйти
+            </button>
+            <button onClick={onClose}>×</button>
+          </div>
+        </div>
+
+        <div style={{ margin: '10px 0 16px' }}>
+          <label style={{ display: 'inline-block' }}>
+            <span style={{ marginRight: 8 }}>Изменить фото:</span>
+            <input type="file" accept="image/*" onChange={onPhotoChange} disabled={savingPhoto} />
+          </label>
+          {savingPhoto && <span style={{ marginLeft: 8, opacity: .8 }}>Сохранение…</span>}
         </div>
 
         {err && <div style={{ color: "#f66", marginBottom: 8 }}>

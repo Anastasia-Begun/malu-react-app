@@ -23,7 +23,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       setRegisterError('');
       onClose();
     } catch (error) {
-      setRegisterError(error.message);
+      setRegisterError(`${error?.code || ''} ${error?.message || error}`.trim());
     }
   };
 
@@ -34,7 +34,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       setLoginError('');
       onClose();
     } catch (error) {
-      setLoginError(error.message);
+      setLoginError(`${error?.code || ''} ${error?.message || error}`.trim());
     }
   };
 
