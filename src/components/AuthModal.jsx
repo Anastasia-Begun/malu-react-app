@@ -15,7 +15,6 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  if (!isOpen) return null;
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -79,6 +78,8 @@ const AuthModal = ({ isOpen, onClose }) => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="auth-modal" onClick={onBackdropClick}>
