@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFirebase } from '../firebase/FirebaseContext';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import { GoogleAuthProvider as ModularGoogleAuthProvider, signInWithPopup as modularSignInWithPopup, getAuth as modularGetAuth } from 'firebase/auth';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const { auth } = useFirebase();
@@ -39,12 +40,17 @@ const AuthModal = ({ isOpen, onClose }) => {
   };
 
   const handleGoogle = async (setError) => {
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
     try {
-      await auth.signInWithPopup(googleProvider);
+      if (auth?.signInWithPopup) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+      } else {
+        const provider = new ModularGoogleAuthProvider();
+        await modularSignInWithPopup(modularGetAuth(), provider);
+      }
       onClose();
     } catch (error) {
-      setError(error.message);
+      setError(error?.message || String(error));
     }
   };
 

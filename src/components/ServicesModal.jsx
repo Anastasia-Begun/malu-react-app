@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  useFirebase,
-  serverTimestamp,
-  Timestamp,
-  anonSignIn,
-  auth,
-} from "../firebase/FirebaseContext";
+import { useFirebase } from "../firebase/FirebaseContext";
 import {
   collection,
   query,
@@ -14,10 +8,12 @@ import {
   onSnapshot,
   doc,
   runTransaction,
+  Timestamp,
+  serverTimestamp,
 } from "firebase/firestore";
 
 const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) => {
-  const { db, user } = useFirebase();
+  const { db, user, auth } = useFirebase();
 
   const [service, setService] = useState(initialService || "makeup");
   const [subService, setSubService] = useState(initialSubService || "day");
@@ -89,9 +85,9 @@ const ServicesModal = ({ isOpen, onClose, initialService, initialSubService }) =
   }, [date, freeSlots]);
 
   const ensureSignedIn = async () => {
-    if (auth.currentUser) return auth.currentUser;
-    await anonSignIn();
-    return auth.currentUser;
+    if (auth?.currentUser) return auth.currentUser;
+    await auth?.signInAnonymously?.();
+    return auth?.currentUser;
   };
 
   const handleBookingSubmit = async (e) => {

@@ -7,7 +7,7 @@ const FirebaseContext = createContext(null);
 
 const firebaseConfig = {
   apiKey: "AIzaSyBe4RtxN-33AvKTlylvBUzkk9Z5RuQ7Sac",
-  authDomain: "malu-af0b0.web.app",
+  authDomain: "malu-af0b0.firebaseapp.com",
   projectId: "malu-af0b0",
   storageBucket: "malu-af0b0.firebasestorage.app",
   messagingSenderId: "961583120487",
